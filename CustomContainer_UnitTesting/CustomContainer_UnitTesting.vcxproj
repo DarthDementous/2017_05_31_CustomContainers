@@ -18,21 +18,10 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Source.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\libs\Include\Container.hpp" />
-    <ClInclude Include="..\libs\Include\Container_Literals.h" />
-    <ClInclude Include="..\libs\Include\LinkedList.hpp" />
-    <ClInclude Include="..\libs\Include\List.hpp" />
-    <ClInclude Include="..\libs\Include\Queue.hpp" />
-    <ClInclude Include="..\libs\Include\Stack.hpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{A7D6F3EB-C294-4A46-8E11-786CFE10C07F}</ProjectGuid>
+    <ProjectGuid>{61D6392D-7079-470B-A1C2-82667FA724CF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>My2017_05_31_CodeDesignCustomContainers</RootNamespace>
+    <RootNamespace>CustomContainer_UnitTesting</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -82,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)\</OutDir>
     <IntDir>$(ProjectDir)$(Configuration)\</IntDir>
     <IncludePath>$(SolutionDir)libs\Include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -91,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)\</OutDir>
     <IntDir>$(ProjectDir)$(Configuration)\</IntDir>
     <IncludePath>$(SolutionDir)libs\Include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -158,6 +147,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
