@@ -124,11 +124,11 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 			int_linklist.PushBack(i);
 		}
 
+		// Cycle forwards
 		int count = 0;
-		for (auto node : int_linklist) {
-			REQUIRE(node == count);
+		for (auto val : int_linklist) {
+			REQUIRE(val == count);
 			count++;
-			std::cout << node << std::endl;
 		}
 
 		REQUIRE(int_linklist.GetSize() == STRESS_NUM);
