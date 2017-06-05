@@ -28,6 +28,10 @@
     <ClInclude Include="..\libs\Include\List.hpp" />
     <ClInclude Include="..\libs\Include\Queue.hpp" />
     <ClInclude Include="..\libs\Include\Stack.hpp" />
+    <ClInclude Include="Header.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A7D6F3EB-C294-4A46-8E11-786CFE10C07F}</ProjectGuid>

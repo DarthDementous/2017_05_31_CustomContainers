@@ -47,24 +47,6 @@ public:
 		m_lastNode = prevNode;
 	}
 
-#pragma region Iteration functionality
-	Iterator begin() {
-		return Iterator(m_firstNode);
-	}
-
-	T* end() {
-		return nullptr;						// Next of the last LinkNode will always be nullptr				
-	}
-
-	void Iterator::operator++() {
-		m_ptr = m_ptr->m_next;				// Point at the next object in the linked list
-	}
-
-	void Iterator::operator--() {
-		m_ptr = m_ptr->m_prev;				// Point at previous object in the linked list
-	}
-#pragma endregion
-
 #pragma region LinkNode
 	/**
 	*	@brief Entity that holds a value and pointers to the previous and next element in the linked list.
@@ -73,13 +55,37 @@ public:
 		LinkNode()	 = default;
 		~LinkNode()	 = default;
 
-		T	m_value;						// Current copy in possession
-		T*	m_next	 = nullptr;				// Next element in linked list
-		T*	m_prev   = nullptr;				// Previous element in linked list
+		T			m_value;						// Current copy in possession
+		LinkNode*	m_next	 = nullptr;				// Next element in linked list
+		LinkNode*	m_prev   = nullptr;				// Previous element in linked list
 
-		operator T() { return m_value; }	/* Typecast instance of LinkNode to its value (LinkNode() = LinkNode.m_value)
-											NOTE: This allows it to be used both ways instead of overloading operator[]*/
+		//operator T() { return m_value; }		/* Typecast instance of LinkNode to its value (LinkNode() = LinkNode.m_value)
+		//										NOTE: This allows it to be used both ways instead of overloading operator[]*/
+
+		/// Ranged-for functionality (cycling forwards)
+
+		bool operator!=(LinkNode a_iter) {		/*Check if the link node is the last node by checking if its pointing to nullptr*/
+			return (m_next != nullptr);
+		}
+
+		void operator++() {						/*Point current link node to the next one*/
+			this = m_next;
+		}
+
+		T& operator*() {						/*De-reference and return alias object in LinkNode*/
+			return m_value;
+		}
 	};
+#pragma endregion
+
+#pragma region Ranged-for functionality
+	LinkNode begin() {
+		return m_firstNode;
+	}
+
+	LinkNode end() {
+		return m_lastNode;
+	}
 #pragma endregion
 
 protected:

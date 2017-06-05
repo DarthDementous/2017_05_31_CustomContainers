@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="LinkedList&lt;T&gt;">
+    <Position X="3.25" Y="3" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="LinkedList&lt;T&gt;::LinkNode" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>C:\Users\s171671\Documents\Repositories\2017_05_31_CustomContainers\libs\Include\LinkedList.hpp</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>IAAAAAACABAAAAAAAQAABAEQAAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>C:\Users\s171671\Documents\Repositories\2017_05_31_CustomContainers\libs\Include\LinkedList.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Container&lt;T&gt;">
+    <Position X="6.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IABAAIQAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAIgAAA=</HashCode>
+      <FileName>C:\Users\s171671\Documents\Repositories\2017_05_31_CustomContainers\libs\Include\Container.hpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

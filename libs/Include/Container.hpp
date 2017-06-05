@@ -35,24 +35,6 @@ public:
 	*/
 	bool	IsEmpty() { return m_size == 0; }
 
-	/**
-	*	@brief	Return alias of element at the top of the container (relative).
-	*/
-	T& Top() { return m_data[m_top]; }
-
-	/**
-	*	@brief	Holds a pointer to a value and can point to the next value contiguously.
-	*/
-	struct Iterator {
-		Iterator(T* a_ptr) : m_ptr(a_ptr) {}
-
-		T*		m_ptr;
-
-		void operator++() {
-			m_ptr += sizeof(T);
-		}
-	};
-
 protected:
 	size_t		m_size = 0;		/* Amount of elements in container, always none by default*/
 	size_t		m_top = 0;		/* Index of the top of the container (relative), 0 by default*/

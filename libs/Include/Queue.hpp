@@ -5,43 +5,29 @@
 #include "Container_Literals.h"
 
 /*
-Queue Queue;
-
-Queue.PushBack(thing);
-Queue.PopBack();
-
-int thing = Queue.Top();
-
-void thing() {
-int x = 4;
-Queue.push_back(x);
-Queue.push_back(2);
-}
-
-void main() {
-Queue[0] = random garbage
-}
-
-
+*	@brief Container that is contiguous in memory and has a first in first out approach.
 */
 template<class T> class Queue : public Container<T> {
-	/*
-	*	@brief Container that is contiguous in memory and has a first in first out approach.
-	*/
-	Queue()  {							
-		m_data = new T[MAX_SIZE]					// Reserve space for data
-	};			 
+public:
+	Queue() {
+		m_top = 0;
+	}
 
 	virtual void PushBack(T a_item) override {
-		assert(m_size <= MAX_SIZE && "Container breaches maximum Queue size.");
+		++m_size;
 
-		m_data[m_size++] = a_item;					// Copy item to data list and increase list size
+		m_data.PushBack(a_item);					// Push back copy of item to data list
 	}
 
 	virtual void PopBack() override {
-		assert(m_size > 0 && "Attempting to pop back on an empty container.")
+		assert(m_size > 0 && "Attempting to pop back on an empty container.");
 		m_size--;									// Decrease size to essentially 'ignore' last element
 	}
+
+	/**
+	*	@brief	Return alias of element at the top of the container (relative).
+	*/
+	T&		Top() { return m_data[m_top]; }
 protected:
 	List<T>		m_data;								/*Dynamic list of data.*/
 };

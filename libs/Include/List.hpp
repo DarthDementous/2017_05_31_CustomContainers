@@ -48,6 +48,11 @@ public:
 
 		return m_data[a_index];
 	}
+
+	/**
+	*	@brief	Return alias of element at the top of the container (relative).
+	*/
+	T&		Top() { return m_data[m_top]; }
 protected:
 	T*			m_data;										/* Array of data in container*/
 	size_t		m_capacity;									/* How much data the list is intended to hold.*/
