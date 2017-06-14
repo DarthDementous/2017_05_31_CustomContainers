@@ -18,8 +18,8 @@ public:
 
 	virtual void PushBack(T a_item) override {
 		++m_size;
-		
-		LinkNode*	tmp = new LinkNode(a_item);
+
+		LinkNode* tmp = new LinkNode(a_item);
 
 		// Initialize first and last nodes with new node in no longer empty list
 		if (m_firstNode == nullptr) {
@@ -36,16 +36,59 @@ public:
 		}
 	}
 
+	void PushFront(T a_item) {
+		++m_size;
+
+		LinkNode* tmp = new LinkNode(a_item);
+
+		// Initialize first and last nodes with new node in no longer empty list
+		if (m_firstNode == nullptr) {
+			m_firstNode = tmp;
+			m_lastNode	= tmp;
+		}
+		// If LinkedList is not empty, point new LinkNode at previously last element and position it in the list with pointers
+		else {
+			m_firstNode->m_prev = tmp;
+			tmp->m_next = m_firstNode;
+			m_firstNode = tmp;
+		}
+	}
+
 	virtual void PopBack() override {
 		assert(m_firstNode != nullptr && "Attempting to pop back on empty linked list.");
-		
+
 		--m_size;
 
-		LinkNode *prevNode = m_lastNode->m_prev;
+		LinkNode *newLastNode = m_lastNode->m_prev;
 
-		// Sever links with end node and replace
-		prevNode->m_next = nullptr;
-		m_lastNode = prevNode;
+		// Sever links with old end node and replace
+		delete newLastNode->m_next;
+		newLastNode->m_next = nullptr;
+		m_lastNode = newLastNode;
+	}
+
+	
+
+	void PopFront() {
+		assert(m_firstNode != nullptr && "Attempting to pop front on empty linked list.");
+
+		--m_size;
+
+		// If there is only one element in the LinkedList, simply delete that element and reset first and last node
+		if (m_firstNode == m_lastNode) {
+			delete m_firstNode;				// Both saved nodes are pointing to the same element
+			m_firstNode = nullptr;
+			m_lastNode	= nullptr;
+			
+			return;
+		}
+
+		LinkNode *newFirstNode = m_firstNode->m_next;
+
+		// Sever links with old front node and replace
+		delete newFirstNode->m_prev;
+		newFirstNode->m_prev = nullptr;
+		m_firstNode = newFirstNode;
 	}
 
 #pragma region LinkNode
@@ -109,33 +152,52 @@ public:
 
 		LinkNode* GetLink() { return m_link; }
 
+		void EraseNode() {
+			delete m_link;
+			m_link = nullptr;
+		}
+
 		T& operator*() {						/*De-reference and return aliased value in LinkNode*/
 			return m_link->GetValue();
 		}
 	};
 
+#pragma endregion
+
 	/**
 	*	@brief Delete dynamically allocated memory held by iterator
+	*	@param a_iter is the iterator position to delete at
+	*/
+	LinkIterator Erase(LinkIterator a_iter) {
+		--m_size;
+
+		// Only sever ties if there is more than one element in the Linked List
+		if (m_firstNode != m_lastNode) {
+			LinkNode* nextNode = a_iter.GetLink()->m_next;
+			LinkNode* prevNode = a_iter.GetLink()->m_prev;
+
+			nextNode->m_prev = nullptr;
+			prevNode->m_next = nullptr;
+		}
+
+		a_iter.EraseNode();
+	}
+
+
+	/**
+	*	@brief Delete dynamically allocated memory held by iterator in a range
 	*	@param a_first is the minimum range of removal
 	*	@param a_last is the maximum range of removal
 	*	@returns iterator position after deleted elements in linked list
 	*/
 	LinkIterator Erase(LinkIterator a_first, LinkIterator a_last) {
-		auto iter = a_first;
-		while (iter != a_last) {
-			// Save next position
-			LinkIterator nextPos = iter;
-			++nextPos;
+		auto currentIter = a_first;
+		while (currentIter != a_last) {
 			
-			// Delete dynamically allocated memory at current position and set iter to next position
-			delete iter.GetLink();
-			iter = nextPos;
 		}
 
-		return iter;
+		return currentIter;
 	}
-
-#pragma endregion
 
 #pragma region Ranged-for functionality
 	LinkIterator begin() {
@@ -143,7 +205,7 @@ public:
 	}
 
 	LinkIterator end() {						/*Point after the linked list ends (sentinel iterator)*/
-		return LinkIterator(m_lastNode->m_next);
+		return LinkIterator(nullptr);
 	}
 #pragma endregion
 

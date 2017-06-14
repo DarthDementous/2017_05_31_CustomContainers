@@ -7,7 +7,7 @@
 #include <Queue.hpp>
 #include <LinkedList.hpp>
 
-#define STRESS_NUM		1000
+#define STRESS_NUM		2
 
 int main() {
 	int result = Catch::Session().run();
@@ -93,17 +93,17 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 
 		str_queue.PushBack("String_1");
 		str_queue.PushBack("String_2");
-		REQUIRE(str_queue.Top() == "String_1");
+		REQUIRE(str_queue.Top() == "String_2");
 
 		REQUIRE(!str_queue.IsEmpty());
 
 		str_queue.PopBack();
 		REQUIRE(str_queue.GetSize() == 1);
 		str_queue.PushBack("String_2");
-		REQUIRE(str_queue.Top() == "String_1");
+		REQUIRE(str_queue.Top() == "String_2");
 
 		str_queue.PopBack();
-		str_queue.PopBack();
+		str_queue.PopBack();			// Pop back with only one element remaining
 		REQUIRE(str_queue.IsEmpty());
 
 		///Strain Testing
@@ -111,7 +111,7 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 
 		for (auto i = 0; i < STRESS_NUM; ++i) {
 			int_queue.PushBack(i);
-			REQUIRE(int_queue.Top() == 0);
+			REQUIRE(int_queue.Top() == i);
 		}
 
 		REQUIRE(int_queue.GetSize() == STRESS_NUM);
@@ -120,6 +120,7 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 	SECTION("DOUBLE_LINKED_LIST") {
 		LinkedList<int> int_linklist;
 
+		// Push to back
 		for (int i = 0; i < STRESS_NUM; i++) {
 			int_linklist.PushBack(i);
 		}
@@ -131,6 +132,39 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 			count++;
 		}
 
-		REQUIRE(int_linklist.GetSize() == STRESS_NUM);
+		// Clear with erase range
+		int_linklist.Erase(int_linklist.begin(), int_linklist.end());
+		REQUIRE(int_linklist.IsEmpty());
+
+		// Push to front
+		for (int i = 0; i < STRESS_NUM; i++) {
+			int_linklist.PushFront(i);
+		}
+
+		// Cycle forwards
+		count = STRESS_NUM - 1;
+		for (auto val : int_linklist) {
+			REQUIRE(val == count);
+			count--;
+		}
+
+		// Clear with pop back
+		for (auto val : int_linklist) {
+			int_linklist.PopBack();
+		}
+
+		REQUIRE(int_linklist.IsEmpty());
+
+		// Fill list again
+		for (int i = 0; i < STRESS_NUM; i++) {
+			int_linklist.PushBack(i);
+		}
+
+		// Clear with pop front
+		for (auto val : int_linklist) {
+			int_linklist.PopFront();
+		}
+
+		REQUIRE(int_linklist.GetSize() == 0);
 	}
 }

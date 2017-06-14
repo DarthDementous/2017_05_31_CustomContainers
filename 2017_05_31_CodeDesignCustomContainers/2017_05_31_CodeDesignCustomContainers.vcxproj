@@ -29,6 +29,7 @@
     <ClInclude Include="..\libs\Include\Queue.hpp" />
     <ClInclude Include="..\libs\Include\Stack.hpp" />
     <ClInclude Include="Header.h" />
+    <ClInclude Include="Map.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
