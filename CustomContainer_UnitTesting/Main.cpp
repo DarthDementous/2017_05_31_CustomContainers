@@ -149,7 +149,7 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		}
 
 		// Clear with pop back
-		for (auto val : int_linklist) {
+		for (auto i = 0; i < STRESS_NUM; ++i) {
 			int_linklist.PopBack();
 		}
 
@@ -161,7 +161,7 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		}
 
 		// Clear with pop front
-		for (auto val : int_linklist) {
+		for (auto i = 0; i < STRESS_NUM; ++i) {
 			int_linklist.PopFront();
 		}
 

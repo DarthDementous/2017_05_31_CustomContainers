@@ -57,13 +57,10 @@ public:
 	virtual void PopBack() override {
 		assert(m_firstNode != nullptr && "Attempting to pop back on empty linked list.");
 
-		--m_size;
-
 		LinkNode *newLastNode = m_lastNode->m_prev;
 
-		// Sever links with old end node and replace
-		delete newLastNode->m_next;
-		newLastNode->m_next = nullptr;
+		// Erase end node and replace
+		Erase(LinkIterator(m_lastNode));
 		m_lastNode = newLastNode;
 	}
 
@@ -72,22 +69,10 @@ public:
 	void PopFront() {
 		assert(m_firstNode != nullptr && "Attempting to pop front on empty linked list.");
 
-		--m_size;
-
-		// If there is only one element in the LinkedList, simply delete that element and reset first and last node
-		if (m_firstNode == m_lastNode) {
-			delete m_firstNode;				// Both saved nodes are pointing to the same element
-			m_firstNode = nullptr;
-			m_lastNode	= nullptr;
-			
-			return;
-		}
-
 		LinkNode *newFirstNode = m_firstNode->m_next;
 
-		// Sever links with old front node and replace
-		delete newFirstNode->m_prev;
-		newFirstNode->m_prev = nullptr;
+		// Erase front node and replace
+		Erase(LinkIterator(m_firstNode));
 		m_firstNode = newFirstNode;
 	}
 
@@ -169,18 +154,33 @@ public:
 	*	@param a_iter is the iterator position to delete at
 	*/
 	LinkIterator Erase(LinkIterator a_iter) {
+		assert(a_iter.GetLink() != nullptr && "Attempting to erase a null iterator.");
+		
 		--m_size;
 
-		// Only sever ties if there is more than one element in the Linked List
-		if (m_firstNode != m_lastNode) {
-			LinkNode* nextNode = a_iter.GetLink()->m_next;
-			LinkNode* prevNode = a_iter.GetLink()->m_prev;
+		// Save next position
+		LinkIterator nextPos = a_iter;
+		++nextPos;
 
+		// Only sever ties if there are any
+		LinkNode* nextNode = a_iter.GetLink()->m_next;
+		LinkNode* prevNode = a_iter.GetLink()->m_prev;
+
+		if (nextNode != nullptr) {
 			nextNode->m_prev = nullptr;
+		} else {
+			m_lastNode = nullptr;			// We are erasing the last node.
+		}
+		if (prevNode != nullptr) {
 			prevNode->m_next = nullptr;
+		}
+		else {
+			m_firstNode = nullptr;			// We are deleting the first node.
 		}
 
 		a_iter.EraseNode();
+
+		return nextPos;
 	}
 
 
@@ -193,7 +193,12 @@ public:
 	LinkIterator Erase(LinkIterator a_first, LinkIterator a_last) {
 		auto currentIter = a_first;
 		while (currentIter != a_last) {
-			
+			// Save next position
+			LinkIterator nextPos = currentIter;
+			++nextPos;
+
+			Erase(currentIter);
+			currentIter = nextPos;
 		}
 
 		return currentIter;
