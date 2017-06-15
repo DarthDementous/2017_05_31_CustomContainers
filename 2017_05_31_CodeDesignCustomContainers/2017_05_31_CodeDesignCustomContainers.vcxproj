@@ -26,9 +26,9 @@
     <ClInclude Include="..\libs\Include\Container_Literals.h" />
     <ClInclude Include="..\libs\Include\LinkedList.hpp" />
     <ClInclude Include="..\libs\Include\List.hpp" />
+    <ClInclude Include="..\libs\Include\Map.hpp" />
     <ClInclude Include="..\libs\Include\Queue.hpp" />
     <ClInclude Include="..\libs\Include\Stack.hpp" />
-    <ClInclude Include="Map.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

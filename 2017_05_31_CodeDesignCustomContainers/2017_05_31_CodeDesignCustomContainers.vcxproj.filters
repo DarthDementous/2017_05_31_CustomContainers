@@ -38,7 +38,7 @@
     <ClInclude Include="..\libs\Include\Stack.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Map.hpp">
+    <ClInclude Include="..\libs\Include\Map.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

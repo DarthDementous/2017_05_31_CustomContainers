@@ -6,6 +6,9 @@
 #include <Stack.hpp>
 #include <Queue.hpp>
 #include <LinkedList.hpp>
+#include <Map.hpp>
+
+#include <string>
 
 #define STRESS_NUM		2
 
@@ -16,7 +19,6 @@ int main() {
 
 	return (result < 0xff ? result : 0xff);
 }
-
 
 //			Description					Label
 TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
@@ -166,5 +168,27 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		}
 
 		REQUIRE(int_linklist.GetSize() == 0);
+	}
+	
+	SECTION("MAP") {
+		Map <int, std::string> planetMap;
+
+		// Insertion
+		planetMap.Insert(new Map<int, std::string>::PairNode(0, "Mercury"));
+		REQUIRE(planetMap[0] == "Mercury");
+
+		// Test ignoring of duplicate keys in pairs
+		planetMap.Insert(new Map<int, std::string>::PairNode(0, "Earth"));
+		REQUIRE(planetMap[0] == "Mercury");
+
+		// Test numerical ordering of keys (smallest to biggest)
+		planetMap.Insert(new Map<int, std::string>::PairNode(4, "Mars"));
+
+		// Test finding a node
+		REQUIRE(planetMap.findNode(4)->m_val == "Mars");
+
+		// Test subscript operator overload
+		planetMap[10] = "Uranus";
+		REQUIRE(planetMap.findNode(10)->m_val == "Uranus");
 	}
 }
