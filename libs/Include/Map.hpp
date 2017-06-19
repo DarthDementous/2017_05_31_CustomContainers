@@ -51,8 +51,8 @@ public:
 		K GetKey() { return m_pair->m_key; }
 		V GetValue() { return m_pair->m_value; }
 
-		bool HasLeft() { return m_left; }
-		bool HasRight() { return m_right; }
+		bool HasLeft() { return m_left != nullptr; }
+		bool HasRight() { return m_right != nullptr; }
 
 		PairNode* m_pair = nullptr;
 		TreeNode* m_left = nullptr;

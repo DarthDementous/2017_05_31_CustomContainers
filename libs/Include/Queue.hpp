@@ -16,14 +16,14 @@ public:
 	virtual void PushBack(T a_item) override {
 		++m_size;
 
-		m_data.PushFront(a_item);					// Push back copy of item to data list
+		m_data.PushBack(a_item);					// Push back item to end of the queue
 	}
 
 	virtual void PopBack() override {
 		assert(m_size > 0 && "Attempting to pop front on an empty container.");
 		m_size--;									// Decrease size
 
-		m_data.PopFront();
+		m_data.PopFront();							// Remove item at the front of the queue
 	}
 
 	/**

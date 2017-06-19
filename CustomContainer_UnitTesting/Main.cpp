@@ -95,17 +95,17 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 
 		str_queue.PushBack("String_1");
 		str_queue.PushBack("String_2");
-		REQUIRE(str_queue.Top() == "String_2");
+		REQUIRE(str_queue.Top() == "String_1");
 
 		REQUIRE(!str_queue.IsEmpty());
 
 		str_queue.PopBack();
 		REQUIRE(str_queue.GetSize() == 1);
-		str_queue.PushBack("String_2");
+		str_queue.PushBack("String_1");
 		REQUIRE(str_queue.Top() == "String_2");
 
 		str_queue.PopBack();
-		str_queue.PopBack();			// Pop back with only one element remaining
+		str_queue.PopBack();								// Pop back with only one element remaining
 		REQUIRE(str_queue.IsEmpty());
 
 		///Strain Testing
@@ -113,7 +113,7 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 
 		for (auto i = 0; i < STRESS_NUM; ++i) {
 			int_queue.PushBack(i);
-			REQUIRE(int_queue.Top() == i);
+			REQUIRE(int_queue.Top() == 0);					// Affirm that the first item pushed back is the first out of the queue
 		}
 
 		REQUIRE(int_queue.GetSize() == STRESS_NUM);
