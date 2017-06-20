@@ -43,8 +43,8 @@ public:
 		V m_val;
 	};
 #pragma endregion
-	
-#pragma region Tree Node
+
+#pragma region Tree Node and Ranged-for Functionality
 	struct TreeNode {
 		TreeNode(PairNode* a_pair) : m_pair(a_pair) {}
 
@@ -57,7 +57,30 @@ public:
 		PairNode* m_pair = nullptr;
 		TreeNode* m_left = nullptr;
 		TreeNode* m_right = nullptr;
+
+		TreeNode& operator++() {				/*PREFIX: Move to next tree node value*/
+			m_pair = m_link->m_next;
+			return *this;
+		}
+
+		LinkIterator operator++(int) {			/*POSTFIX: Move to the next link node value after leaving the expression*/
+			LinkNode result(*this);
+			++(*this);
+			return result;
+		}
+
+		///Check if the link node is the sentinel node by checking if its pointing to nullptr
+		bool operator==(LinkIterator a_iter) {
+			return (m_link == a_iter.GetLink());
+		}
+
+		bool operator!=(LinkIterator a_iter) {
+			return (m_link != a_iter.GetLink());
+		}
 	};
+
+	TreeNode* begin() { m_rootNode; }
+	TreeNode* end() { TreeNode(nullptr); }
 #pragma endregion
 	
 	/**
