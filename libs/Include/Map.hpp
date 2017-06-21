@@ -44,45 +44,165 @@ public:
 	};
 #pragma endregion
 
-#pragma region Tree Node and Ranged-for Functionality
+#pragma region Tree Node
 	struct TreeNode {
 		TreeNode(PairNode* a_pair) : m_pair(a_pair) {}
 
 		K GetKey() { return m_pair->m_key; }
 		V GetValue() { return m_pair->m_value; }
 
-		bool HasLeft() { return m_left != nullptr; }
-		bool HasRight() { return m_right != nullptr; }
+		bool HasValidLeft() { 
+			if (m_left) {
+				return !m_left->visited;
+			}
+			return false;
+		}
 
-		PairNode* m_pair = nullptr;
-		TreeNode* m_left = nullptr;
-		TreeNode* m_right = nullptr;
+		bool HasValidRight() {
+			if (m_right) {
+				return !m_right->visited;
+			}
+			return false;
+		}
 
-		TreeNode& operator++() {				/*PREFIX: Move to next tree node value*/
-			m_pair = m_link->m_next;
+		// No unvisited children or parents, end of binary tree
+		bool IsEnd() { 
+			if (m_parent) {
+				if (m_left) {
+					return m_left->visited;
+				}
+				if (m_right) {
+					return m_right->visited;
+				}
+			}
+			return false;
+		}		
+
+		PairNode* m_pair	= nullptr;
+		TreeNode* m_parent	= nullptr;
+		TreeNode* m_left	= nullptr;
+		TreeNode* m_right	= nullptr;
+
+		// Traversal variables
+		bool visited = false;										/*Track if node is visited to avoid returning duplicate pairs*/
+	};
+#pragma endregion
+
+#pragma region Tree Iterator and Ranged-for Functionality
+	struct TreeIterator {
+		// I am Map's friend, I have access to its protected and private variables
+		friend class Map<K, V>;	
+
+		TreeIterator(TreeNode* a_ptr) : m_ptr(a_ptr) {}
+
+		TreeNode* m_ptr = nullptr;
+
+		K GetKey() { return m_ptr->m_pair->m_key; }
+
+		PairNode& operator*() {
+			return *m_ptr->m_pair;
+		}
+
+		TreeIterator& operator++() {									/*PREFIX: Increment in order to next tree node value*/
+			/// 1. Node has an unvisited left child, move to it.
+			if (m_ptr->HasValidLeft()) {
+				m_ptr->m_left->visited = true;
+
+				m_ptr = m_ptr->m_left;
+				return *this;
+			}
+
+			/// 2. Node has an unvisited right child, move to it.
+			if (m_ptr->HasValidRight()) {
+				m_ptr->m_right->visited = true;
+
+				m_ptr = m_ptr->m_right;
+				return *this;
+			}
+
+			/// 3. Node has no valid children, move to unvisited parent or next valid child.
+			TreeNode* currentParent = m_ptr->m_parent;
+
+			// Find first unvisited parent
+			while (currentParent) {
+				if (!currentParent->visited) {
+					currentParent->visited = true;
+
+					m_ptr = currentParent;
+					return *this;
+				}
+				currentParent = currentParent->m_parent;
+			}
+
+			// No unvisited parents but unvisited children, go to valid left or right child of visited parent via operator recursion
+			if (!m_ptr->IsEnd()) {
+				*this = ++TreeIterator(m_ptr->m_parent);						// Use recursion to set iterator to valid child
+				return *this;
+			}
+
+			/// 4. Node is at the end, it has no more unvisited parents AND no more unvisited children.
+			m_ptr = nullptr;
+			// Reset visitation status of all nodes so that tree can be traversed again
+			//RecurResetTraversal(m_rootNode);
+
 			return *this;
 		}
 
-		LinkIterator operator++(int) {			/*POSTFIX: Move to the next link node value after leaving the expression*/
-			LinkNode result(*this);
+		TreeIterator operator++(int) {							/*POSTFIX: Move to the next tree node value after leaving the expression*/
+			TreeNode result(*this);
 			++(*this);
 			return result;
 		}
 
-		///Check if the link node is the sentinel node by checking if its pointing to nullptr
-		bool operator==(LinkIterator a_iter) {
-			return (m_link == a_iter.GetLink());
-		}
-
-		bool operator!=(LinkIterator a_iter) {
-			return (m_link != a_iter.GetLink());
+		// Check if the tree node is the sentinel node by checking if its holding nullptr
+		bool operator!=(TreeIterator a_iter) {
+			return m_ptr != a_iter.m_ptr;
 		}
 	};
 
-	TreeNode* begin() { m_rootNode; }
-	TreeNode* end() { TreeNode(nullptr); }
+	TreeIterator begin() { return TreeIterator(GetFirstNode()); }
+	TreeIterator end() { return TreeIterator(nullptr); }
 #pragma endregion
-	
+
+	/**
+	*	@brief Get the currently most left-most element in the binary tree.
+	*	@return	The first element smallest-biggest in the binary tree.
+	*/
+	TreeNode* GetFirstNode() {
+		TreeNode* currentNode = m_rootNode;
+
+		while (currentNode->m_left) {
+			currentNode = currentNode->m_left;
+		}
+
+		// First node always counts as visited
+		currentNode->visited = true;
+
+		return currentNode;
+	}
+
+	/**
+	*	@brief Get the node at the root of the tree.
+	*/
+	TreeNode* GetRoot() {
+		return m_rootNode;
+	}
+
+	/**
+	*	@brief Reset visited status of all tree nodes so that tree can be traversed again.
+	*/
+	void RecurResetTraversal(TreeNode* a_node) {
+		// Still nodes to cover
+		if (a_node) {
+			RecurResetTraversal(a_node->m_left);						// Recursively destroy left sub-tree
+
+			// Set node to unvisited
+			a_node->visited = false;
+
+			RecurResetTraversal(a_node->m_right);						// Recursively destroy right sub-tree
+		}
+	}
+
 	/**
 	*	@brief Use recursion to destroy entire tree and clean up allocated memory.
 	*	@param a_node is the root node the deletion spreads out from.
@@ -94,12 +214,12 @@ public:
 		}
 
 		// Recursively destroy left branch
-		if (a_node->HasLeft()) {
+		if (a_node->m_left) {
 			RecurDestroyTree(a_node->m_left);
 		}
 
 		// Recursively destroy right branch
-		if (a_node->HasRight()) {
+		if (a_node->m_right) {
 			RecurDestroyTree(a_node->m_right);
 		}
 
@@ -117,10 +237,14 @@ public:
 	*/
 	void Insert(PairNode* a_pair) {
 		TreeNode* targetParent = nullptr;
+		TreeNode* newNode	   = new TreeNode(a_pair);
 
 		// Binary tree is empty, set root node
 		if (m_rootNode == nullptr) {
-			m_rootNode = new TreeNode(a_pair);
+			// Parent is root
+			newNode->m_parent = m_rootNode;
+
+			m_rootNode		  = newNode;
 			return;
 		}
 		
@@ -146,11 +270,13 @@ public:
 		}
 
 		// Set new node relative to found parent
+		newNode->m_parent = targetParent;
+
 		if (a_pair->m_key > targetParent->GetKey()) {
-			targetParent->m_right = new TreeNode(a_pair);
+			targetParent->m_right	= newNode;
 		}
 		else {
-			targetParent->m_left = new TreeNode(a_pair);
+			targetParent->m_left	= newNode;
 		}
 	}
 
@@ -197,5 +323,5 @@ public:
 		}
 	}
 private:
-	TreeNode* m_rootNode = nullptr;							/*Root parent of the binary tree.*/
+	TreeNode* m_rootNode = nullptr;										/*Root parent of the binary tree.*/
 };

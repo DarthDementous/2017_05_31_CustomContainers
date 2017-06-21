@@ -184,11 +184,32 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		// Test numerical ordering of keys (smallest to biggest)
 		planetMap.Insert(new Map<int, std::string>::PairNode(4, "Mars"));
 
+		// Test adding a key smaller than root
+		planetMap.Insert(new Map<int, std::string>::PairNode(-5, "Pluto"));
+		REQUIRE(planetMap[-5] == "Pluto");
+
 		// Test finding a node
 		REQUIRE(planetMap.findNode(4)->m_val == "Mars");
 
 		// Test subscript operator overload
 		planetMap[10] = "Uranus";
 		REQUIRE(planetMap.findNode(10)->m_val == "Uranus");
+
+		// Test begin returns first element
+		REQUIRE(planetMap.begin().GetKey() == -5);
+
+		// Test traversal through binary tree
+		for (auto pair : planetMap) {
+			std::cout << pair.m_key << std::endl;
+		}
+
+		std::cout << std::endl;
+
+		planetMap.RecurResetTraversal(planetMap.GetRoot());
+
+		// Make sure binary tree can be traversed multiple times
+		for (auto iter = planetMap.begin(); iter != planetMap.end(); ++iter) {
+			std::cout << (*iter).m_key << std::endl;
+		}
 	}
 }
