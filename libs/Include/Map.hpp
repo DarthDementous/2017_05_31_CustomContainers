@@ -65,17 +65,19 @@ public:
 			return false;
 		}
 
-		// No unvisited children or parents, end of binary tree
-		bool IsEnd() { 
-			if (m_parent) {
-				if (m_left) {
-					return m_left->visited;
+		// See if there's any unvisited children at any of the visited parents
+		TreeNode* GetFamilyParent() { 
+			TreeNode* currentParent = m_parent;
+
+			while (currentParent) {
+				// A parent with unvisited children still exists, not at the end.
+				if (currentParent->HasValidLeft() || currentParent->HasValidRight()) {
+					return currentParent;
 				}
-				if (m_right) {
-					return m_right->visited;
-				}
+				currentParent = currentParent->m_parent;
 			}
-			return false;
+
+			return nullptr;
 		}		
 
 		PairNode* m_pair	= nullptr;
@@ -98,6 +100,35 @@ public:
 		TreeNode* m_ptr = nullptr;
 
 		K GetKey() { return m_ptr->m_pair->m_key; }
+
+		/**
+		*	@brief Find root from current node and return it
+		*	@return Node at the root of the tree.
+		*/
+		TreeNode* GetRoot() {
+			TreeNode* rootNode = this->m_ptr;
+
+			while (rootNode->m_parent) {
+				rootNode = rootNode->m_parent;
+			}
+
+			return rootNode;
+		}
+
+		/**
+		*	@brief Reset visited status of all tree nodes so that tree can be traversed again.
+		*/
+		void RecurResetTraversal(TreeNode* a_node) {
+			// Still nodes to cover
+			if (a_node) {
+				RecurResetTraversal(a_node->m_left);						// Recursively destroy left sub-tree
+
+																			// Set node to unvisited
+				a_node->visited = false;
+
+				RecurResetTraversal(a_node->m_right);						// Recursively destroy right sub-tree
+			}
+		}
 
 		PairNode& operator*() {
 			return *m_ptr->m_pair;
@@ -134,22 +165,23 @@ public:
 				currentParent = currentParent->m_parent;
 			}
 
-			// No unvisited parents but unvisited children, go to valid left or right child of visited parent via operator recursion
-			if (!m_ptr->IsEnd()) {
-				*this = ++TreeIterator(m_ptr->m_parent);						// Use recursion to set iterator to valid child
+			// Definitely no unvisited parents but there could be unvisited children.
+			TreeNode* familyParent = m_ptr->GetFamilyParent();				// Find parent with unvisited children
+			if (familyParent) {
+				*this = ++TreeIterator(familyParent);						// Use recursion to set iterator to valid child
 				return *this;
 			}
 
 			/// 4. Node is at the end, it has no more unvisited parents AND no more unvisited children.
-			m_ptr = nullptr;
 			// Reset visitation status of all nodes so that tree can be traversed again
-			//RecurResetTraversal(m_rootNode);
+			RecurResetTraversal(GetRoot());
+			m_ptr = nullptr;
 
 			return *this;
 		}
 
 		TreeIterator operator++(int) {							/*POSTFIX: Move to the next tree node value after leaving the expression*/
-			TreeNode result(*this);
+			TreeIterator result(*this);
 			++(*this);
 			return result;
 		}
@@ -179,28 +211,6 @@ public:
 		currentNode->visited = true;
 
 		return currentNode;
-	}
-
-	/**
-	*	@brief Get the node at the root of the tree.
-	*/
-	TreeNode* GetRoot() {
-		return m_rootNode;
-	}
-
-	/**
-	*	@brief Reset visited status of all tree nodes so that tree can be traversed again.
-	*/
-	void RecurResetTraversal(TreeNode* a_node) {
-		// Still nodes to cover
-		if (a_node) {
-			RecurResetTraversal(a_node->m_left);						// Recursively destroy left sub-tree
-
-			// Set node to unvisited
-			a_node->visited = false;
-
-			RecurResetTraversal(a_node->m_right);						// Recursively destroy right sub-tree
-		}
 	}
 
 	/**

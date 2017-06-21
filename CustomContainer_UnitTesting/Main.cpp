@@ -10,7 +10,7 @@
 
 #include <string>
 
-#define STRESS_NUM		2
+#define STRESS_NUM		10
 
 int main() {
 	int result = Catch::Session().run();
@@ -173,7 +173,7 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 	SECTION("MAP") {
 		Map <int, std::string> planetMap;
 
-		// Insertion
+		/// Insertion
 		planetMap.Insert(new Map<int, std::string>::PairNode(0, "Mercury"));
 		REQUIRE(planetMap[0] == "Mercury");
 
@@ -198,16 +198,25 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		// Test begin returns first element
 		REQUIRE(planetMap.begin().GetKey() == -5);
 
+		/// Stress test
+		for (auto i = 0; i < STRESS_NUM; i++) {
+			planetMap[i] = "Planet";
+			REQUIRE(planetMap.findNode(i)->m_val == "Planet");
+		}
+
+		// Insertion after subscript operator
+		planetMap.Insert(new Map<int, std::string>::PairNode(20, "Planet"));
+
 		// Test traversal through binary tree
+		std::cout << "FIRST TRAVERSAL:" << std::endl;
 		for (auto pair : planetMap) {
 			std::cout << pair.m_key << std::endl;
 		}
 
 		std::cout << std::endl;
 
-		planetMap.RecurResetTraversal(planetMap.GetRoot());
-
 		// Make sure binary tree can be traversed multiple times
+		std::cout << "SECOND TRAVERSAL:" << std::endl;
 		for (auto iter = planetMap.begin(); iter != planetMap.end(); ++iter) {
 			std::cout << (*iter).m_key << std::endl;
 		}
