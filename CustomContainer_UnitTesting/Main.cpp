@@ -77,6 +77,10 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		str_stk.PopBack();
 		REQUIRE(str_stk.IsEmpty());
 
+		// Test contains function
+		str_stk.PushBack("Found_Item");
+		REQUIRE(str_stk.Contains("Found_Item"));
+
 		///Strain Testing
 		Stack<int>			int_stk;
 

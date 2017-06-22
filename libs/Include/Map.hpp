@@ -191,10 +191,10 @@ public:
 			return m_ptr != a_iter.m_ptr;
 		}
 	};
+#pragma endregion
 
 	TreeIterator begin() { return TreeIterator(GetFirstNode()); }
 	TreeIterator end() { return TreeIterator(nullptr); }
-#pragma endregion
 
 	/**
 	*	@brief Get the currently most left-most element in the binary tree.
