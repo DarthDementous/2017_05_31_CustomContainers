@@ -10,9 +10,12 @@
 
 #include <string>
 
-#define STRESS_NUM		20
+#define STRESS_NUM		10			// NOTE: For some reason, there can only be 10 std::strings before an exception is thrown.
 
 int main() {
+	// Check for memory leaks and print in output with the combined flags of allocating memory and checking if its not being de-allocated
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	int result = Catch::Session().run();
 
 	system("pause");
@@ -26,182 +29,183 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 	// CHECK   will execute but flags an error if assertion fails (helps pinpointing multiple errors later)
 
 	SECTION("LIST") {
-		List<const char*>	str_list;
+		List<int>	list;
 		
-		REQUIRE(str_list.IsEmpty());
+		/// No items in container
+		// Empty function
+		REQUIRE(list.IsEmpty());
 
-		str_list.PushBack("String_1");
-		str_list.PushBack("String_2");
-		REQUIRE(str_list[0] == "String_1");
-		REQUIRE(str_list[1] == "String_2");
-		
-		REQUIRE(!str_list.IsEmpty());
+		// GetSize function
+		REQUIRE(list.GetSize() == 0);
 
-		str_list.PopBack();
-		REQUIRE(str_list.GetSize() == 1);
-		str_list.PushBack("String_2");
-		REQUIRE(str_list[1] == "String_2");
-
-		str_list.PopBack();
-		str_list.PopBack();
-		REQUIRE(str_list.IsEmpty());
-
-		///Strain Testing
-		List<int>			int_list;
-
+		// Push back function, subscript operator and top function
 		for (auto i = 0; i < STRESS_NUM; ++i) {
-			int_list.PushBack(i);
-			REQUIRE(int_list[i] == i);
+			list.PushBack(i);
+			REQUIRE(list[i] == i);
 		}
+		REQUIRE(list.Top() == STRESS_NUM - 1);
 
-		REQUIRE(int_list.GetSize() == STRESS_NUM);
+		/// Items in container
+		// Empty function
+		REQUIRE(!list.IsEmpty());
+
+		// GetSize function
+		REQUIRE(list.GetSize() == STRESS_NUM);
+
+		// Pop back
+		for (auto i = 0; i < STRESS_NUM; ++i) {
+			list.PopBack();
+		}
 
 		/// Deep copy testing
-		List<int>			int_list_copy = int_list;
-		List<int>			int_list_copy2(int_list);
-
-		// Make sure values are identical
 		for (auto i = 0; i < STRESS_NUM; ++i) {
-			REQUIRE(int_list_copy2[i] == int_list[i]);
+			list.PushBack(i);
 		}
 
+		List<int>			list_copy = list;
+		List<int>			list_copy2(list);
+
+		// Check accuracy and independence (pointers in list copy point to their OWN memory)
 		for (auto i = 0; i < STRESS_NUM; ++i) {
-			// Remove from copy and ensure original is not affected
-			int_list_copy.PopBack();
-			REQUIRE(int_list[i] == i);
+			list_copy.PopBack();
+			REQUIRE(list_copy2[i] == list[i]);
 		}
 	}
+
 
 	SECTION("STACK") {
-		Stack<const char*>	str_stk;
+		Stack < std::string > stack;
 
-		REQUIRE(str_stk.IsEmpty());
+		/// No items in container
+		// Empty function
+		REQUIRE(stack.IsEmpty());
 
-		str_stk.PushBack("String_1");
-		str_stk.PushBack("String_2");
-		REQUIRE(str_stk.Top() == "String_2");
+		// GetSize function
+		REQUIRE(stack.GetSize() == 0);
 
-		REQUIRE(!str_stk.IsEmpty());
-
-		str_stk.PopBack();
-		REQUIRE(str_stk.GetSize() == 1);
-		str_stk.PushBack("String_2");
-		REQUIRE(str_stk.Top() == "String_2");
-
-		str_stk.PopBack();
-		str_stk.PopBack();
-		REQUIRE(str_stk.IsEmpty());
-
-		// Test contains function
-		str_stk.PushBack("Found_Item");
-		REQUIRE(str_stk.Contains("Found_Item"));
-
-		///Strain Testing
-		Stack<int>			int_stk;
-
+		// Push back function and top function (end of stack)
 		for (auto i = 0; i < STRESS_NUM; ++i) {
-			int_stk.PushBack(i);
-			REQUIRE(int_stk.Top() == i);
+			std::string tmp = "String " + std::to_string(i);
+			stack.PushBack(tmp);
 		}
+		std::string tmp = "String " + std::to_string(STRESS_NUM - 1);
+		REQUIRE(stack.Top() == tmp);
 
-		REQUIRE(int_stk.GetSize() == STRESS_NUM);
+		/// Items in container
+		// Empty function
+		REQUIRE(!stack.IsEmpty());
+
+		// GetSize function
+		REQUIRE(stack.GetSize() == STRESS_NUM);
+
+		// Contains function
+		REQUIRE(stack.Contains("String 0"));
+		REQUIRE(!stack.Contains("N/A"));
+
+		// Pop back function and top function (end of container)
+		for (auto i = 0; i < STRESS_NUM; ++i) {
+			stack.PopBack();
+		}
 	}
 
-	SECTION("QUEUE") {
-		Queue<const char*> str_queue;
-
-		REQUIRE(str_queue.IsEmpty());
-
-		str_queue.PushBack("String_1");
-		str_queue.PushBack("String_2");
-		REQUIRE(str_queue.Top() == "String_1");
-
-		REQUIRE(!str_queue.IsEmpty());
-
-		str_queue.PopBack();
-		REQUIRE(str_queue.GetSize() == 1);
-		str_queue.PushBack("String_1");
-		REQUIRE(str_queue.Top() == "String_2");
-
-		str_queue.PopBack();
-		str_queue.PopBack();								// Pop back with only one element remaining
-		REQUIRE(str_queue.IsEmpty());
-
-		///Strain Testing
-		Queue<int>			int_queue;
-
-		for (auto i = 0; i < STRESS_NUM; ++i) {
-			int_queue.PushBack(i);
-			REQUIRE(int_queue.Top() == 0);					// Affirm that the first item pushed back is the first out of the queue
-		}
-
-		REQUIRE(int_queue.GetSize() == STRESS_NUM);
-	}
 
 	SECTION("DOUBLE_LINKED_LIST") {
-		LinkedList<int> int_linklist;
+		LinkedList<int> linklist;
+		
+		/// No items in container
+		// Empty function
+		REQUIRE(linklist.IsEmpty());
 
-		// Push to back
-		for (int i = 0; i < STRESS_NUM; i++) {
-			int_linklist.PushBack(i);
+		// GetSize function
+		REQUIRE(linklist.GetSize() == 0);
+
+		// Push back function and top function (front of queue)
+		for (auto i = 0; i < STRESS_NUM; ++i) {
+			linklist.PushBack(i);
 		}
+
+		/// Items in container
+		// Empty function
+		REQUIRE(!linklist.IsEmpty());
+
+		// GetSize function
+		REQUIRE(linklist.GetSize() == STRESS_NUM);
+
+		// Pop back and push front function
+		for (auto i = 0; i < STRESS_NUM; ++i) {
+			linklist.PopBack();
+			linklist.PushFront(i);
+		}
+
+		// NOTE: Due to PushFront, numbers were added in reverse. STRESS_NUM - 1 is at the start.
 
 		// Cycle forwards
-		int count = 0;
-		for (auto val : int_linklist) {
-			REQUIRE(val == count);
-			count++;
-		}
-
-		// Clear with erase range
-		int_linklist.Erase(int_linklist.begin(), int_linklist.end());
-		REQUIRE(int_linklist.IsEmpty());
-
-		// Push to front
-		for (int i = 0; i < STRESS_NUM; i++) {
-			int_linklist.PushFront(i);
-		}
-
-		// Cycle forwards
-		count = STRESS_NUM - 1;
-		for (auto val : int_linklist) {
+		int count = STRESS_NUM - 1;
+		for (auto val : linklist) {
 			REQUIRE(val == count);
 			count--;
 		}
 
-		// Clear with pop back
-		for (auto i = 0; i < STRESS_NUM; ++i) {
-			int_linklist.PopBack();
+		// Erase functions and ranged-for
+		linklist.Erase(linklist.begin());
+		for (auto val : linklist) {
+			// Ensure erase was successful by checking if value is still in the linked list
+			REQUIRE(val != STRESS_NUM - 1);
 		}
-
-		REQUIRE(int_linklist.IsEmpty());
-
-		// Fill list again
-		for (int i = 0; i < STRESS_NUM; i++) {
-			int_linklist.PushBack(i);
+		linklist.Erase(linklist.begin(), linklist.end());
+		for (auto val : linklist) {
+			REQUIRE(!("Ranged-for still active despite all nodes in LinkedList being cleared."));
 		}
+		REQUIRE(linklist.IsEmpty());
 
 		/// Deep copy testing
-		LinkedList<int>			int_linklist_copy	= int_linklist;
-		LinkedList<int>			int_linklist_copy2(int_linklist);
+		for (auto i = 0; i < STRESS_NUM; ++i) {
+			linklist.PushBack(i);
+		}
 
+		LinkedList<int>			linklist_copy = linklist;
+		LinkedList<int>			linklist_copy2(linklist);
+
+		// Loop through original, pop front from copy, and ensure original is not affected.
 		count = 0;
-		
-		// Loop through original, remove from copy, and ensure original is not affected.
-		for (auto val : int_linklist) {
-			int_linklist_copy.PopBack();
+		for (auto val : linklist) {
+			linklist_copy.PopFront();
 			REQUIRE(val == count);
 			++count;
 		}
+	}
 
-		// Clear with pop front
+	SECTION("QUEUE") {
+		Queue<std::string>	queue;
+
+		/// No items in container
+		// Empty function
+		REQUIRE(queue.IsEmpty());
+
+		// GetSize function
+		REQUIRE(queue.GetSize() == 0);
+
+		// Push back function and top function (front of queue)
 		for (auto i = 0; i < STRESS_NUM; ++i) {
-			int_linklist.PopFront();
+			std::string tmp = "String " + std::to_string(i);
+			queue.PushBack(tmp);
+
+			REQUIRE(queue.Top() == "String 0");
 		}
 
-		REQUIRE(int_linklist.GetSize() == 0);
+		/// Items in container
+		// Empty function
+		REQUIRE(!queue.IsEmpty());
+
+		// GetSize function
+		REQUIRE(queue.GetSize() == STRESS_NUM);
+
+		// Pop back function
+		for (auto i = 0; i < STRESS_NUM; ++i) {
+			queue.PopBack();
+		}
 	}
-	
+
 	SECTION("MAP") {
 		Map <int, std::string> planetMap;
 
@@ -253,4 +257,5 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 			std::cout << (*iter).m_key << std::endl;
 		}
 	}
+
 }

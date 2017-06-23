@@ -50,8 +50,9 @@ public:
 	}
 
 	virtual void PushBack(T a_item) override {
-		// If adding to list goes over capacity, copy over old data to new one
 		m_top = m_size++;
+
+		// If adding to list goes over capacity, copy over old data to new one
 		if (m_size > m_capacity) {
 			T* newMem = new T[m_size];						// Reserve space for combined data
 			memcpy(newMem, m_data, sizeof(T) * m_size);		// Copy over current data to new space in memory
@@ -69,8 +70,9 @@ public:
 
 	virtual void PopBack() override {
 		assert(m_size > 0 && "Attempting to pop back on an empty container.");
-
-		m_size--;											// Decrease size to essentially 'ignore' last element
+		// Decrease size and top to essentially 'ignore' last element
+		--m_top;
+		--m_size;										
 	}
 
 	T& operator[](size_t a_index) {
