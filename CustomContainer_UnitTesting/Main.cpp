@@ -10,7 +10,7 @@
 
 #include <string>
 
-#define STRESS_NUM		10
+#define STRESS_NUM		20
 
 int main() {
 	int result = Catch::Session().run();
@@ -55,6 +55,21 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		}
 
 		REQUIRE(int_list.GetSize() == STRESS_NUM);
+
+		/// Deep copy testing
+		List<int>			int_list_copy = int_list;
+		List<int>			int_list_copy2(int_list);
+
+		// Make sure values are identical
+		for (auto i = 0; i < STRESS_NUM; ++i) {
+			REQUIRE(int_list_copy2[i] == int_list[i]);
+		}
+
+		for (auto i = 0; i < STRESS_NUM; ++i) {
+			// Remove from copy and ensure original is not affected
+			int_list_copy.PopBack();
+			REQUIRE(int_list[i] == i);
+		}
 	}
 
 	SECTION("STACK") {
@@ -164,6 +179,19 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		// Fill list again
 		for (int i = 0; i < STRESS_NUM; i++) {
 			int_linklist.PushBack(i);
+		}
+
+		/// Deep copy testing
+		LinkedList<int>			int_linklist_copy	= int_linklist;
+		LinkedList<int>			int_linklist_copy2(int_linklist);
+
+		count = 0;
+		
+		// Loop through original, remove from copy, and ensure original is not affected.
+		for (auto val : int_linklist) {
+			int_linklist_copy.PopBack();
+			REQUIRE(val == count);
+			++count;
 		}
 
 		// Clear with pop front
