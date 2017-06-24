@@ -72,7 +72,6 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		}
 	}
 
-
 	SECTION("STACK") {
 		Stack < std::string > stack;
 
@@ -107,7 +106,6 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 			stack.PopBack();
 		}
 	}
-
 
 	SECTION("DOUBLE_LINKED_LIST") {
 		LinkedList<int> linklist;
@@ -234,16 +232,16 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 		// Test begin returns first element
 		REQUIRE(planetMap.begin().GetKey() == -5);
 
-		/// Stress test
+		///Stress test
 		for (auto i = 0; i < STRESS_NUM; i++) {
 			planetMap[i] = "Planet";
 			REQUIRE(planetMap.findNode(i)->m_val == "Planet");
 		}
 
-		// Insertion after subscript operator
+		//Insertion after subscript operator
 		planetMap.Insert(new Map<int, std::string>::PairNode(20, "Planet"));
 
-		// Test traversal through binary tree
+		//Test traversal through binary tree
 		std::cout << "FIRST TRAVERSAL:" << std::endl;
 		for (auto pair : planetMap) {
 			std::cout << pair.m_key << std::endl;

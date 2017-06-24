@@ -2,26 +2,6 @@
 
 #include <assert.h>
 
-/*
-CONSTRUCTION:
-std::map<textureID, std::shared_ptr<aie::Texture>>  m_textureList;   //We want to assign the same texture to multiple things, therefore shared pointer
-std::map<fontID, std::shared_ptr<aie::Font>>		m_fontList;
-std::map<audioID, std::shared_ptr<aie::Audio>>      m_audioList;
-
-SETTING VALUES TO KEYS:
-m_textureList[TITLE] = ResourceManager::loadResource<aie::Texture>("./Asteroid Fall/Art/title.png");
-m_textureList[BTN] = ResourceManager::loadResource<aie::Texture>("./Asteroid Fall/Art/button_base.png");
-m_textureList[M_BG] = ResourceManager::loadResource<aie::Texture>("./Asteroid Fall/Art/menu.png");
-
-GETTING VALUES FROM KEYS:
-m_Player = EntityMaker::createPlayer(m_textureList[PLAYER_SPRITE].get());
-
-RULES:
-- Must sort its values by key in numerical/alphabetical order (smallest to biggest by default)
-- Must hold non-contiguous PairNodes
-- No two values in a map can have the same key
-*/
-
 /**
 *	@brief Container of paired key-values stored in a binary tree.
 */
@@ -30,9 +10,7 @@ public:
 	Map() = default;
 	~Map() {
 		// If not empty, destroy all nodes
-		if (m_rootNode) {
-			RecurDestroyTree(m_rootNode);
-		}
+		RecurDestroyTree(m_rootNode);
 	}
 
 #pragma region Pair Node
@@ -49,7 +27,7 @@ public:
 		TreeNode(PairNode* a_pair) : m_pair(a_pair) {}
 
 		K GetKey() { return m_pair->m_key; }
-		V GetValue() { return m_pair->m_value; }
+		V& GetValue() { return m_pair->m_value; }
 
 		bool HasValidLeft() { 
 			if (m_left) {
@@ -92,18 +70,17 @@ public:
 
 #pragma region Tree Iterator and Ranged-for Functionality
 	struct TreeIterator {
-		// I am Map's friend, I have access to its protected and private variables
-		friend class Map<K, V>;	
-
 		TreeIterator(TreeNode* a_ptr) : m_ptr(a_ptr) {}
 
 		TreeNode* m_ptr = nullptr;
 
-		K GetKey() { return m_ptr->m_pair->m_key; }
+		K GetKey() { return m_ptr->GetKey(); }
+		PairNode* GetPair() { return m_ptr->m_pair; }
 
 		/**
-		*	@brief Find root from current node and return it
-		*	@return Node at the root of the tree.
+		*	@brief Climb up current node's parents until at the root node.
+		*	NOTE: The only way to get the root node without having to pass it in as a parameter to TreeIterator.
+		*	@return The root node of the tree.
 		*/
 		TreeNode* GetRoot() {
 			TreeNode* rootNode = this->m_ptr;
@@ -123,7 +100,7 @@ public:
 			if (a_node) {
 				RecurResetTraversal(a_node->m_left);						// Recursively destroy left sub-tree
 
-																			// Set node to unvisited
+				// Set node to unvisited
 				a_node->visited = false;
 
 				RecurResetTraversal(a_node->m_right);						// Recursively destroy right sub-tree
@@ -131,6 +108,7 @@ public:
 		}
 
 		PairNode& operator*() {
+			// No need for bracquets because the member access operator takes higher precedence to the de-reference operator
 			return *m_ptr->m_pair;
 		}
 
@@ -201,8 +179,14 @@ public:
 	*	@return	The first element smallest-biggest in the binary tree.
 	*/
 	TreeNode* GetFirstNode() {
+		// If tree is empty, the first node is nullptr
+		if (!m_rootNode) {
+			return nullptr;
+		}
+
 		TreeNode* currentNode = m_rootNode;
 
+		// Keep going left until no more left children
 		while (currentNode->m_left) {
 			currentNode = currentNode->m_left;
 		}
@@ -251,17 +235,14 @@ public:
 
 		// Binary tree is empty, set root node
 		if (m_rootNode == nullptr) {
-			// Parent is root
-			newNode->m_parent = m_rootNode;
-
-			m_rootNode		  = newNode;
+			m_rootNode = newNode;
 			return;
 		}
 		
 		// Search starts at root of the tree
 		TreeNode* currentParent = m_rootNode;
 		
-		// Find the target parent with null children
+		// Find the target parent with null spot for new child
 		while (currentParent) {
 			targetParent = currentParent;
 
@@ -299,27 +280,19 @@ public:
 	*	@param a_key is the key associated to the value.
 	*	@return found node or nullptr if node not found.
 	*/
-	PairNode* findNode(K a_key) {
-		// Search starts at root of the tree
-		TreeNode* currentParent = m_rootNode;
+	PairNode* findNode(K a_key) {		
+		// Search for node
+		for (auto iter = begin(); iter != end(); iter++) {
+			if (iter.GetKey() == a_key) {
+				// Reset visitation status of all nodes because we're exiting iteration prematurely.
+				iter.RecurResetTraversal(m_rootNode);
 
-		// Find the corresponding node
-		while (currentParent) {
-			// Found the right node.
-			if (a_key == currentParent->GetKey()) {
-				return currentParent->m_pair;
-			}
-
-			// Move to right child if key is greater/left if key is smaller
-			if (a_key > currentParent->GetKey()) {
-				currentParent = currentParent->m_right;
-			}
-			else {
-				currentParent = currentParent->m_left;
+				// Found the node! Return a pointer to it.
+				return iter.GetPair();
 			}
 		}
 
-		// Did not find node.
+		// Pair not found.
 		return nullptr;
 	}
 
