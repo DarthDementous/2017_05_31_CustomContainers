@@ -144,6 +144,9 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 			count--;
 		}
 
+		// Find iterator function
+		REQUIRE(linklist.FindIter(0).GetLink()->GetValue() == 0);
+
 		// Erase functions and ranged-for
 		linklist.Erase(linklist.begin());
 		for (auto val : linklist) {
@@ -155,6 +158,10 @@ TEST_CASE("Testing Custom Containers", "[CONTAINERS]") {
 			REQUIRE(!("Ranged-for still active despite all nodes in LinkedList being cleared."));
 		}
 		REQUIRE(linklist.IsEmpty());
+
+		// Test iterating on null terminator
+		auto iter = linklist.end();
+		REQUIRE(++iter == linklist.end());
 
 		/// Deep copy testing
 		for (auto i = 0; i < STRESS_NUM; ++i) {
